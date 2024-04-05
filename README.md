@@ -24,3 +24,4 @@ You will also have setup a postgres local db to run this project
 2. Auth handling using jwt instead of dummy token
 3. Crisper UI
 4. Edge case handling for market transactions
+5. Add dockerfile
