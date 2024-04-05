@@ -1,4 +1,6 @@
-# Welcome to linby demo!
+https://www.loom.com/share/55c0efc9ebd0490ab888390e66b1043b?sid=3efe80e4-d6eb-403a-8e7c-f5ef492a746c
+
+# Welcome to linkby demo!
 
 ## project is divided into client and server
 
