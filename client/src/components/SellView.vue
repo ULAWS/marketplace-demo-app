@@ -33,7 +33,14 @@
       </div>
       <div class="mb-4">
         <label for="images" class="block text-sm font-medium text-gray-700">Images</label>
-        <input type="file" id="images" ref="fileInput" class="hidden" @change="handleFileInputChange" />
+        <input
+          type="file"
+          id="images"
+          multiple="multiple"
+          ref="fileInput"
+          class="hidden"
+          @change="handleFileInputChange"
+        />
         <button
           type="button"
           @click="$refs.fileInput.click()"

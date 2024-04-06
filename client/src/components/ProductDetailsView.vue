@@ -1,6 +1,14 @@
 <template>
   <div>
-    <h2 class="text-2xl font-semibold mb-4">{{ product.name }}</h2>
+    <div class="flex justify-between w-full">
+      <h2 class="text-2xl font-semibold mb-4">{{ product.name }}</h2>
+      <button @click="close" type="button" class="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring">
+        <span class="sr-only">Close</span>
+        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
     <p>Status: {{ getStatusText(product.statusId) }}</p>
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
       <div v-if="product?.images?.length">
@@ -21,7 +29,7 @@
           <button
             v-if="product.statusId === 1 && isPendingCounterOffer"
             class="mt-4 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-            @click="acceptCounterOffer(offer.price, userId, product.sellerId)"
+            @click="acceptCounterOffer(counterOfferPrice, userId, product.sellerId)"
           >
             Accept
           </button>
@@ -91,6 +99,7 @@ export default {
       isInCounterProcess: false,
       isCounterOfferMade: false,
       isPendingCounterOffer: false,
+      counterOfferPrice: 0,
       offerBy: 0,
       offerTo: 0,
     };
@@ -130,9 +139,9 @@ export default {
           throw new Error("Failed to accept counter offer");
         }
 
-        alert("Counter offer accepted successfully");
         this.closeCounterOfferPopup();
-        this.$router.go();
+        this.fetchProductDetails();
+        alert("Counter offer sent successfully");
       } catch (error) {
         console.error("Error accepting counter offer:", error);
         alert("Failed to accept counter offer");
@@ -157,9 +166,9 @@ export default {
           throw new Error("Failed to send counter offer");
         }
 
-        alert("Counter offer sent successfully");
         this.closeCounterOfferPopup();
-        this.$router.go();
+        this.fetchProductDetails();
+        alert("Counter offer sent successfully");
       } catch (error) {
         console.error("Error sending counter offer:", error);
         alert("Failed to send counter offer");
@@ -191,9 +200,10 @@ export default {
             if (it.offerBy === "Seller") countersMadeBySeller.push(it.buyerName);
             else if (!countersMadeBySeller.includes(it.buyerName)) it.showCounter = true;
           }
-          if (!response.statusId === 3 && it.status === "accepted" && it.buyerName === this.username)
+          if (response.statusId !== 3 && it.status === "accepted" && it.buyerName === this.username) {
             this.isReservedForUser = true;
-          this.reservedPrice = it.price;
+            this.reservedPrice = it.price;
+          }
         });
         const coBuyer = response.negotiationHistory.filter(
           (it) => it.buyerName === this.username && it.offerBy === "Buyer"
@@ -204,7 +214,10 @@ export default {
         if (coBuyer.length) {
           this.isInCounterProcess = true;
           if (coBuyer > coSeller) this.isCounterOfferMade = true;
-          else if (coSeller.length > 0) this.isPendingCounterOffer = true;
+          else if (coSeller.length > 0) {
+            this.isPendingCounterOffer = true;
+            this.counterOfferPrice = coSeller[0].price;
+          }
         }
         this.product = response;
       } catch (error) {
@@ -238,6 +251,9 @@ export default {
       } catch (error) {
         console.error("Error fetching product details:", error);
       }
+    },
+    close() {
+      this.$router.push("/products");
     },
   },
 };
